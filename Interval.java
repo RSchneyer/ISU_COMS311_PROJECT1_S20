@@ -16,5 +16,16 @@ public class Interval {
     public boolean overlap(Interval i){
         int iLow = i.getLow();
         int iHigh = i.getHigh();
+        //TODO: Simplify the following logic
+        //TODO: Not sure if the following logic handles when the highs and/or lows are the same
+        return (((iLow<low)&&(iHigh>high))||
+                ((iLow>low)&&(iHigh<high))||
+                ((iLow<low)&&(iHigh<high))||
+                ((iLow>low)&&(iHigh>high)));
+
+
+
+
+
     }
 }
