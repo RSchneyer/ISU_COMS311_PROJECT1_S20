@@ -197,4 +197,27 @@ public class IntervalTreap
             x.setiMax(Math.max(childMax, x.getInterv().getHigh()));
         }
     }
+
+    /**
+     * Prints the IntervalTreap in order
+     * nodes are printed as followed:
+     * ([intervalMin, intervalMax], iMax, priority)
+     */
+    public static void inorder(Node n)
+    {
+        if (node == null)
+        {
+            return;
+        }
+        inorder(n.getLeft());
+        System.out.println("([%d,%d], %d, %d)", 
+                            n.getInterv().getLow(),
+                            n.getInterv().getHigh(),
+                            n.getImax(),
+                            n.getPriority());
+        inorder(n.getRight());
+    }
+
+
+
 }
