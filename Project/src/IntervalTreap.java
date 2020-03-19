@@ -131,7 +131,6 @@ public class IntervalTreap
                 fixMax(z);
             }
         }
-
     }
 
     /**
@@ -156,12 +155,24 @@ public class IntervalTreap
         {
             return null;
         }
-        //TODO
-        return null;
+        Node x = root;
+        while(x != null && !x.getInterv().overlap(i))
+        {
+            //i is to the left
+            if(x.getLeft() != null && x.getLeft().getIMax() >= i.getLow())
+            {
+                x = x.getLeft();
+            }
+            else
+            {
+                x = x.getRight();
+            }
+        }
+        return x;
     }
 
     /**
-     * returns the max of two values since it's annoying to code it out
+     * Fixes the max of the node
      */
     private void fixMax(Node x)
     {
