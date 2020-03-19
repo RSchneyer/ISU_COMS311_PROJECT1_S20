@@ -1,3 +1,6 @@
+/**
+ * @author Justin Merkel, Reid Schneyer
+ */
 public class IntervalTreap
 {
     private Node root;
@@ -140,6 +143,60 @@ public class IntervalTreap
      */
     void intervalDelete(Node z)
     {
+        size--;
+        //if z is a leaf
+        if(z.getRight() == null && z.getLeft() == null)
+        {
+            //Fix iMaxUp
+            recFixMax(z.getParent());
+            if(z.getParent().getLeft().equals(z))
+            {
+                z.getParent().setLeft(null);
+            }
+            else
+            {
+                z.getParent().setRight(null);
+            }
+            return;
+        }
+        //Find the replacement node (could be null)
+        Node replacement = null;
+        if(z.getLeft() == null)
+        {
+            replacement = z.getRight();
+        }
+        else if(z.getRight() == null)
+        {
+            replacement = z.getLeft();
+        }
+        else
+        {
+            replacement = min(z.getRight());
+            // This case is different since minheap can be violated
+            // TODO code here
+        }
+        //Remove the replacement from its location and recursively fix the max
+        if(replacement.getParent().getRight().equals(replacement))
+        {
+            replacement.getParent().setRight(null);
+            recFixMax(replacement.getParent());
+        }
+        else
+        {
+            replacement.getParent().setLeft(null);
+            recFixMax(replacement.getParent());
+        }
+        //Now place it in and recursively fix imax
+        if(z.getParent().getLeft().equals(z))
+        {
+            z.getParent().setLeft(replacement);
+            recFixMax(z.getParent());
+        }
+        else
+        {
+            z.getParent().setRight(replacement);
+            recFixMax(z.getParent());
+        }
 
     }
 
@@ -199,6 +256,48 @@ public class IntervalTreap
     }
 
     /**
+     * Replaces with children nodes.
+     */
+    private void replace(Node newChild, Node oldChild, Node parent)
+    {
+        if(parent.getRight().equals(oldChild))
+        {
+            parent.setRight(newChild);
+            newChild.setParent(parent);
+        }
+        else
+        {
+            parent.setLeft(newChild);
+            newChild.setParent(parent);
+        }
+    }
+
+    /**
+     * Get the min of a subtree
+     */
+    private Node min(Node x)
+    {
+        while(x.getLeft() != null)
+        {
+            x = x.getLeft();
+        }
+        return x;
+    }
+
+    /**
+     * Recursive call to fix imax up
+     */
+    private void recFixMax(Node n)
+    {
+        if(n.equals(root))
+        {
+            return;
+        }
+        fixMax(n);
+        recFixMax(n.getParent());
+    }
+
+    /**
      * Prints the IntervalTreap in order
      * nodes are printed as followed:
      * ([intervalMin, intervalMax], iMax, priority)
@@ -210,14 +309,10 @@ public class IntervalTreap
             return;
         }
         inorder(n.getLeft());
-        System.out.printf("([%d,%d], %d, %d) \n", 
-                            n.getInterv().getLow(),
-                            n.getInterv().getHigh(),
-                            n.getIMax(),
-                            n.getPriority());
+        System.out.println("([" + n.getInterv().getLow()+ "," +
+                            n.getInterv().getHigh() + "], " +
+                            n.getIMax() + ", " +
+                            n.getPriority() + ")");
         inorder(n.getRight());
     }
-
-
-
 }
