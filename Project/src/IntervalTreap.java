@@ -205,15 +205,15 @@ public class IntervalTreap
      */
     public static void inorder(Node n)
     {
-        if (node == null)
+        if (n == null)
         {
             return;
         }
         inorder(n.getLeft());
-        System.out.println("([%d,%d], %d, %d)", 
+        System.out.printf("([%d,%d], %d, %d) \n", 
                             n.getInterv().getLow(),
                             n.getInterv().getHigh(),
-                            n.getImax(),
+                            n.getIMax(),
                             n.getPriority());
         inorder(n.getRight());
     }
