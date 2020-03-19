@@ -296,4 +296,23 @@ public class IntervalTreap
         fixMax(n);
         recFixMax(n.getParent());
     }
+
+    /**
+     * Prints the IntervalTreap in order
+     * nodes are printed as followed:
+     * ([intervalMin, intervalMax], iMax, priority)
+     */
+    public static void inorder(Node n)
+    {
+        if (n == null)
+        {
+            return;
+        }
+        inorder(n.getLeft());
+        System.out.println("([" + n.getInterv().getLow()+ "," +
+                            n.getInterv().getHigh() + "], " +
+                            n.getIMax() + ", " +
+                            n.getPriority() + ")");
+        inorder(n.getRight());
+    }
 }

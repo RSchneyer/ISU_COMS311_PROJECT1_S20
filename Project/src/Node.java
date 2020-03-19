@@ -68,5 +68,13 @@ public class Node
     {
         this.iMax = iMax;
     }
+    
+    /**
+     * Method for testing only!
+     */
+    public void setPriority(int newPriority)
+    {
+        this.priority = newPriority;
+    }
 
 }
