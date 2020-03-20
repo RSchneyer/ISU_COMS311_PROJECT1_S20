@@ -18,7 +18,7 @@ public class IntervalTreapTester
             testTreap.intervalInsert(testNode);
         }
 
-        System.out.printf("\nTreap complete, now inorder printing\n");
+        System.out.printf("\nTreap of size " + testTreap.getSize() +" complete, now inorder printing\n");
         IntervalTreap.inorder(testTreap.getRoot());
 
     }

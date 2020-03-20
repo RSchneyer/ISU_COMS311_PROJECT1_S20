@@ -63,7 +63,7 @@ public class IntervalTreap
         Node y = root;
         //Log(n) while
         int nodeHeight = 0;
-        while((!y.getLeft().equals(z)) && (!y.getRight().equals(z)))
+        while(true) //might be better as a check/boolean flag
         {
             //Going down so our height increases (might cause off by one but too lazy to double check)
             nodeHeight++;
@@ -79,6 +79,8 @@ public class IntervalTreap
                 if(y.getLeft() == null)
                 {
                     y.setLeft(z);
+                    z.setParent(y);
+                    break;
                 }
                 else
                 {
@@ -91,6 +93,8 @@ public class IntervalTreap
                 if(y.getRight() == null)
                 {
                     y.setRight(z);
+                    z.setParent(y);
+                    break;
                 }
                 else
                 {
@@ -104,10 +108,14 @@ public class IntervalTreap
         }
         //Now that we found our insertion point, second phase begins
         //Log(n) while
-        while(z.getPriority() <= y.getPriority())
+        while(z != null && y != null && z.getPriority() <= y.getPriority())
         {
+            if(root.equals(z))
+            {
+                break;
+            }
             //Determine which way to rotate
-            if(y.getLeft().equals(z))
+            if(y.getLeft()!= null && y.getLeft().equals(z))
             {
                 //right rotation
                 //Swap right subtrees
@@ -126,6 +134,7 @@ public class IntervalTreap
                 //swap left subtrees
                 y.setRight(z.getLeft());
                 z.setLeft(y);
+
                 //swap parents
                 z.setParent(y.getParent());
                 y.setParent(z);
@@ -133,6 +142,11 @@ public class IntervalTreap
                 fixMax(y);
                 fixMax(z);
             }
+            if(y.equals(root))
+            {
+                root = z;
+            }
+            y = z.getParent();
         }
     }
 
