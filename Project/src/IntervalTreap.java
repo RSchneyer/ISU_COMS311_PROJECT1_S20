@@ -142,6 +142,18 @@ public class IntervalTreap
                 fixMax(y);
                 fixMax(z);
             }
+            //Need to update parents parent if it exists.
+            if(z.getParent()!= null)
+            {
+                if(z.getParent().getRight().equals(y))
+                {
+                    z.getParent().setRight(z);
+                }
+                else
+                {
+                    z.getParent().setLeft(z);
+                }
+            }
             if(y.equals(root))
             {
                 root = z;
@@ -187,7 +199,32 @@ public class IntervalTreap
         {
             replacement = min(z.getRight());
             // This case is different since minheap can be violated
-            // TODO code here
+            if(replacement.getParent().getRight() != null &&
+                    replacement.getParent().getRight().equals(replacement))
+            {
+                replacement.getParent().setRight(z);
+            }
+            else
+            {
+                replacement.getParent().setLeft(z);
+
+            }
+            //swap nodes then try deleting in new spot
+            Node temp = replacement.getRight();
+            Node tempP = replacement.getParent()
+            replacement.setLeft(z.getLeft());
+            replacement.setRight(z.getRight());
+            replacement.setParent(z.getParent());
+            z.setLeft(null);
+            z.setRight(temp);
+            z.setParent(tempP);
+            //didnt end up deleting will do it next time
+            size++;
+            intervalDelete(z);
+            //Fix replacement then move on
+            recFixMax(replacement);
+            //Finish moving replacement down
+            rotateDown(replacement);
         }
         //Remove the replacement from its location and recursively fix the max
         if(replacement.getParent().getRight().equals(replacement))
@@ -329,4 +366,12 @@ public class IntervalTreap
                             n.getPriority() + ")");
         inorder(n.getRight());
     }
+
+    /**
+     * TODO This will rotate a node down so that delete guarantees min heap status
+     * Might be done in insert so convert it.
+     */
+    private void rotateDown(Node n)
+    {}
+
 }
