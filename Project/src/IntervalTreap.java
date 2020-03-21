@@ -115,44 +115,15 @@ public class IntervalTreap
                 break;
             }
             //Determine which way to rotate
-            if(y.getLeft()!= null && y.getLeft().equals(z))
+            if(y.getLeft() != null && y.getLeft().equals(z)) //z is left child of parent
             {
-                //right rotation
-                //Swap right subtrees
-                y.setLeft(z.getRight());
-                z.setRight(y);
-                //swap parents
-                z.setParent(y.getParent());
-                y.setParent(z);
-                //need to fix imaxes only changes y and z
-                fixMax(y);
-                fixMax(z);
+                //right rotation on parent
+                rotateRight(y);
             }
-            else
+            else if(y.getRight() != null && y.getRight().equals(z))
             {
-                //left rotation
-                //swap left subtrees
-                y.setRight(z.getLeft());
-                z.setLeft(y);
-
-                //swap parents
-                z.setParent(y.getParent());
-                y.setParent(z);
-
-                fixMax(y);
-                fixMax(z);
-            }
-            //Need to update parents parent if it exists.
-            if(z.getParent()!= null)
-            {
-                if(z.getParent().getRight().equals(y))
-                {
-                    z.getParent().setRight(z);
-                }
-                else
-                {
-                    z.getParent().setLeft(z);
-                }
+                //left rotation on parent
+                rotateLeft(y);
             }
             if(y.equals(root))
             {
@@ -266,8 +237,8 @@ public class IntervalTreap
         Node x = root;
         while(x != null && !x.getInterv().overlap(i))
         {
-            //i is to the left
-            if(x.getLeft() != null && x.getLeft().getIMax() >= i.getLow())
+            //Currently the low is higher than our low so move left
+            if(x.getInterv().getLow() > i.getLow())
             {
                 x = x.getLeft();
             }
@@ -275,6 +246,15 @@ public class IntervalTreap
             {
                 x = x.getRight();
             }
+           /* //i is to the left
+            if(x.getLeft() != null && x.getLeft().getIMax() >= i.getLow())
+            {
+                x = x.getLeft();
+            }
+            else
+            {
+                x = x.getRight();
+            } */
         }
         return x;
     }
@@ -368,6 +348,14 @@ public class IntervalTreap
     }
 
     /**
+     * Gets the successor
+     */
+    public static Node successor(Node n)
+    {
+        if(n.getRight())
+    }
+
+    /**
      * This will rotate a node down so that delete guarantees min heap status in Log n
      */
     private void rotateDown(Node n)
@@ -415,6 +403,18 @@ public class IntervalTreap
      */
     private void rotateRight(Node n)
     {
+        if(n.getParent() != null)
+        {
+            if(n.getParent().getRight() != null && n.getParent().getRight().equals(n))
+            {
+                n.getParent().setRight(n.getLeft());
+            }
+            else
+            {
+                n.getParent().setLeft(n.getLeft());
+            }
+        }
+
         //Get left node and temp right subtree of left
         Node m = n.getLeft();
         Node temp = m.getRight();
@@ -435,6 +435,16 @@ public class IntervalTreap
      */
     private void rotateLeft(Node n)
     {
+        if(n.getParent() != null)
+        {
+            if (n.getParent().getRight() != null && n.getParent().getRight().equals(n))
+            {
+                n.getParent().setRight(n.getRight());
+            } else
+            {
+                n.getParent().setLeft(n.getRight());
+            }
+        }
         //Get right node and temp left subtree of right
         Node m = n.getRight();
         Node temp = m.getLeft();
