@@ -211,14 +211,14 @@ public class IntervalTreap
             }
             //swap nodes then try deleting in new spot
             Node temp = replacement.getRight();
-            Node tempP = replacement.getParent()
+            Node tempP = replacement.getParent();
             replacement.setLeft(z.getLeft());
             replacement.setRight(z.getRight());
             replacement.setParent(z.getParent());
             z.setLeft(null);
             z.setRight(temp);
             z.setParent(tempP);
-            //didnt end up deleting will do it next time
+            //didnt end up deleting will do it next time since x left is null
             size++;
             intervalDelete(z);
             //Fix replacement then move on
@@ -368,10 +368,85 @@ public class IntervalTreap
     }
 
     /**
-     * TODO This will rotate a node down so that delete guarantees min heap status
-     * Might be done in insert so convert it.
+     * This will rotate a node down so that delete guarantees min heap status in Log n
      */
     private void rotateDown(Node n)
-    {}
+    {
+        //we know this node has less priority since it's a successor
+        while(rotateDownCheck(n))
+        {
 
+            //Determine which way we can rotate (rotations preserve inorder so only thing that matters is priority)
+            if(n.getRight() != null && n.getPriority() >= n.getRight().getPriority()) //If n has a right child with less priority we need to rotate down
+            {
+                rotateLeft(n);
+            }
+            else if(n.getLeft() != null && n.getPriority() >= n.getLeft().getPriority()) // IF n has a left child with less priority we need to rotate down
+            {
+                rotateRight(n);
+            }
+        }
+    }
+
+    private boolean rotateDownCheck(Node n)
+    {
+        if(n.getLeft() == null && n.getRight() == null) //leaf so we done
+        {
+            return false;
+        }
+        else if(n.getLeft() == null && (n.getRight() != null && n.getRight().getPriority() > n.getPriority())) //left is null and right has greater priority
+        {
+            return false;
+        }
+        else if(n.getRight() == null && (n.getLeft() != null && n.getLeft().getPriority()> n.getPriority())) //right is null and right has greater priority
+        {
+            return false;
+        }
+        else if((n.getRight() != null && n.getRight().getPriority() > n.getPriority())
+                && (n.getLeft() != null && n.getLeft().getPriority() > n.getPriority())) //Left and right exist and have greater priority
+        {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Rotates a nodes left subtree to the right
+     */
+    private void rotateRight(Node n)
+    {
+        //Get left node and temp right subtree of left
+        Node m = n.getLeft();
+        Node temp = m.getRight();
+
+        //move left
+        m.setRight(n);
+        n.setLeft(temp);
+        //Fix Parents
+        m.setParent(n.getParent());
+        n.setParent(m);
+        //Fix Max
+        fixMax(n);
+        fixMax(m);
+    }
+
+    /**
+     * Rotates a nodes right subtree left
+     */
+    private void rotateLeft(Node n)
+    {
+        //Get right node and temp left subtree of right
+        Node m = n.getRight();
+        Node temp = m.getLeft();
+
+        //move left
+        m.setLeft(n);
+        n.setRight(temp);
+        //Fix Parents
+        m.setParent(n.getParent());
+        n.setParent(m);
+        //Fix Max
+        fixMax(n);
+        fixMax(m);
+    }
 }
