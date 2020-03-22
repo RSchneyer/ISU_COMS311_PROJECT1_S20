@@ -445,16 +445,6 @@ public class IntervalTreap
         {
             root = m;
         }
-        int nH = IntervalTreapTester.GetHeightNode(n, 0);
-        int mH = IntervalTreapTester.GetHeightNode(m, 0);
-        if(nH != n.getHeight())
-        {
-            int x = 100;
-        }
-        if(mH != m.getHeight())
-        {
-            int x = 122;
-        }
     }
 
     /**
@@ -494,16 +484,6 @@ public class IntervalTreap
         if(n.equals(root))
         {
             root = m;
-        }
-        int nH = IntervalTreapTester.GetHeightNode(n, 0);
-        int mH = IntervalTreapTester.GetHeightNode(m, 0);
-        if(nH != n.getHeight())
-        {
-            int x = 100;
-        }
-        if(mH != m.getHeight())
-        {
-            int x = 122;
         }
     }
 
