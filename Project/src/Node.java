@@ -8,6 +8,7 @@ public class Node
     private Interval nodeInterval;
     private int iMax;
     private int priority;
+    private int height;
 
     public Node(Interval i)
     {
@@ -77,4 +78,23 @@ public class Node
         this.priority = newPriority;
     }
 
+    public int getHeight()
+    {
+        return height;
+    }
+
+    public void setHeight(int height)
+    {
+        this.height = height;
+    }
+
+    public void incHeight()
+    {
+        height++;
+    }
+
+    public void decHeight()
+    {
+        height--;
+    }
 }

@@ -37,7 +37,11 @@ public class IntervalTreap
      */
     int getHeight()
     {
-        return height;
+        if(root == null)
+        {
+            return 0;
+        }
+        return root.getHeight();
     }
 
     /**
@@ -46,21 +50,22 @@ public class IntervalTreap
      * treap properties. The expected running time of this method should be O(log n) on an
      * n-node interval treap.
      */
-    void intervalInsert(Node z)
+    public void intervalInsert(Node z)
     {
         //Add size from new node
         size++;
+        z.setHeight(0);
         //empty root case
         if(root == null)
         {
             root = z;
-            height = 0; //Im pretty sure height starts at 0
             return;
         }
         //First set z.imax to z.high
         z.setiMax(z.getInterv().getHigh());
         //Go down using zlow as key
         Node y = root;
+      //  recIntInsert(z,root);
         //Log(n) while
         int nodeHeight = 0;
         while(true) //might be better as a check/boolean flag
@@ -72,6 +77,7 @@ public class IntervalTreap
             {
                 y.setiMax(z.getIMax());
             }
+
             //try left
             if(y.getInterv().getLow() > z.getInterv().getLow())
             {
@@ -106,13 +112,16 @@ public class IntervalTreap
         {
             height = nodeHeight;
         }
+        recFixHeight(y);
         //Now that we found our insertion point, second phase begins
         //Log(n) while
-        while(z != null && y != null && z.getPriority() <= y.getPriority())
+
+        while(y!= null && z.getPriority() <= y.getPriority())
         {
-            if(root.equals(z))
+            y = z.getParent();
+            if(y.equals(root))
             {
-                break;
+                root = z;
             }
             //Determine which way to rotate
             if(y.getLeft() != null && y.getLeft().equals(z)) //z is left child of parent
@@ -125,14 +134,11 @@ public class IntervalTreap
                 //left rotation on parent
                 rotateLeft(y);
             }
-            if(y.equals(root))
-            {
-                root = z;
-            }
             y = z.getParent();
+            fixHeight(y);
         }
+        recFixHeight(y);
     }
-
     /**
      * removes node z from the interval treap. This operation
      * must maintain the required interval treap properties. The expected running time of this
@@ -246,15 +252,6 @@ public class IntervalTreap
             {
                 x = x.getRight();
             }
-           /* //i is to the left
-            if(x.getLeft() != null && x.getLeft().getIMax() >= i.getLow())
-            {
-                x = x.getLeft();
-            }
-            else
-            {
-                x = x.getRight();
-            } */
         }
         return x;
     }
@@ -306,7 +303,7 @@ public class IntervalTreap
     /**
      * Get the min of a subtree
      */
-    private Node min(Node x)
+    public static Node min(Node x)
     {
         while(x.getLeft() != null)
         {
@@ -352,7 +349,15 @@ public class IntervalTreap
      */
     public static Node successor(Node n)
     {
-        if(n.getRight())
+        if(n.getRight() != null)
+            return min(n.getRight());
+        Node parent = n.getParent();
+        while(parent != null && n.equals(parent.getRight()))
+        {
+            n = parent;
+            parent = parent.getParent();
+        }
+        return parent;
     }
 
     /**
@@ -400,11 +405,16 @@ public class IntervalTreap
 
     /**
      * Rotates a nodes left subtree to the right
+     *            n                     m
+     *         m    3         ->      1   n
+     *       1   2                       2  3
      */
     private void rotateRight(Node n)
     {
+        //If n's parent exists
         if(n.getParent() != null)
         {
+            //If the right child isnt null and is n
             if(n.getParent().getRight() != null && n.getParent().getRight().equals(n))
             {
                 n.getParent().setRight(n.getLeft());
@@ -417,21 +427,41 @@ public class IntervalTreap
 
         //Get left node and temp right subtree of left
         Node m = n.getLeft();
-        Node temp = m.getRight();
-
+        Node two = m.getRight();
+        if(two!= null){two.setParent(n); } //THIS LINE IS PAIN
         //move left
         m.setRight(n);
-        n.setLeft(temp);
+        n.setLeft(two);
         //Fix Parents
         m.setParent(n.getParent());
         n.setParent(m);
         //Fix Max
         fixMax(n);
         fixMax(m);
+        //now heights change
+        fixHeight(n);
+        fixHeight(m);
+        if(n.equals(root))
+        {
+            root = m;
+        }
+        int nH = IntervalTreapTester.GetHeightNode(n, 0);
+        int mH = IntervalTreapTester.GetHeightNode(m, 0);
+        if(nH != n.getHeight())
+        {
+            int x = 100;
+        }
+        if(mH != m.getHeight())
+        {
+            int x = 122;
+        }
     }
 
     /**
      * Rotates a nodes right subtree left
+     *      *            m                     n
+     *      *         n    3         <-      1   m
+     *      *       1   2                       2  3
      */
     private void rotateLeft(Node n)
     {
@@ -448,15 +478,90 @@ public class IntervalTreap
         //Get right node and temp left subtree of right
         Node m = n.getRight();
         Node temp = m.getLeft();
-
+        if(temp!= null){temp.setParent(n);} //THIS LINE IS PAIN
         //move left
         m.setLeft(n);
         n.setRight(temp);
         //Fix Parents
         m.setParent(n.getParent());
         n.setParent(m);
-        //Fix Max
+        //Fix maxes
         fixMax(n);
         fixMax(m);
+        //fix height
+        fixHeight(n);
+        fixHeight(m);
+        if(n.equals(root))
+        {
+            root = m;
+        }
+        int nH = IntervalTreapTester.GetHeightNode(n, 0);
+        int mH = IntervalTreapTester.GetHeightNode(m, 0);
+        if(nH != n.getHeight())
+        {
+            int x = 100;
+        }
+        if(mH != m.getHeight())
+        {
+            int x = 122;
+        }
+    }
+
+    private void fixHeight(Node n)
+    {
+        if(n == null)
+        {
+            return;
+        }
+        int right = 0;
+        int left =0;
+        if(n.getLeft() == null && n.getRight() == null)
+        {
+            n.setHeight(0);
+            return;
+        }
+        if(n.getLeft() != null)
+        {
+            left = n.getLeft().getHeight();
+        }
+        if(n.getRight()!= null)
+        {
+            right = n.getRight().getHeight();
+        }
+        n.setHeight(Math.max(left,right) + 1);
+    }
+    /**
+     * Returns a reference to a node in the treap such that low = low and high = high
+     */
+    public Node intervalSearchExactly(Interval i)
+    {
+        if(root == null)
+        {
+            return null;
+        }
+        Node x = root;
+        while(x != null && !(x.getInterv().getLow() == i.getLow() && x.getInterv().getHigh() == i.getHigh()))
+        {
+            //Currently the low is higher than our low so move left
+            if(x.getInterv().getLow() > i.getLow())
+            {
+                x = x.getLeft();
+            }
+            else
+            {
+                x = x.getRight();
+            }
+        }
+        return x;
+    }
+
+    private void recFixHeight(Node n)
+    {
+        if(n == null)
+        {
+            return;
+        }
+        fixHeight(n);
+        recFixHeight(n.getParent());
     }
 }
