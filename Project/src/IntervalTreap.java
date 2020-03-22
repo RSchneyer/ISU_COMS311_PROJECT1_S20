@@ -65,7 +65,6 @@ public class IntervalTreap
         z.setiMax(z.getInterv().getHigh());
         //Go down using zlow as key
         Node y = root;
-      //  recIntInsert(z,root);
         //Log(n) while
         int nodeHeight = 0;
         while(true) //might be better as a check/boolean flag
@@ -114,8 +113,7 @@ public class IntervalTreap
         }
         recFixHeight(y);
         //Now that we found our insertion point, second phase begins
-        //Log(n) while
-
+        //Log(n) while since rotations and fixHeight are O(1)
         while(y!= null && z.getPriority() <= y.getPriority())
         {
             y = z.getParent();
@@ -137,6 +135,7 @@ public class IntervalTreap
             y = z.getParent();
             fixHeight(y);
         }
+        //Need to fix all the way up again Still logn
         recFixHeight(y);
     }
     /**

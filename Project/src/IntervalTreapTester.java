@@ -103,10 +103,6 @@ public class IntervalTreapTester
         int expectedHeight = treap.getHeight();
         int actual = GetHeight(treap.getRoot(),-1);
         System.out.println("expected " + expectedHeight + " actual" + actual);
-        if(GetHeight(treap.getRoot(), -1) != treap.getHeight())
-        {
-
-        }
         assertTrue(GetHeight(treap.getRoot(), -1) == treap.getHeight());
 
     }
@@ -117,7 +113,31 @@ public class IntervalTreapTester
         assertTrue(MaxRec(treap.getRoot()));
     }
 
-    public static int GetHeightNode(Node n, int prev)
+    @Test
+    public void InsertMaintainsPriority()
+    {
+        assertTrue(recCheckPrio(treap.getRoot()));
+    }
+
+   public static boolean recCheckPrio(Node n)
+    {
+        if(n == null || n.getParent() == null)
+        {
+            return true;
+        }
+        if(n.getPriority() > n.getParent().getPriority())
+        {
+            boolean right = recCheckPrio(n.getRight());
+            boolean left = recCheckPrio(n.getLeft());
+            if(left && right)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+  /* -----------------------------TESTCODE------------------------------
+   public static int GetHeightNode(Node n, int prev)
     {
         //starts at 0
         if(n == null)
@@ -138,7 +158,7 @@ public class IntervalTreapTester
         {
             return left + 1;
         }
-    }
+    } */
 
     public static int GetHeight(Node n, int prev)
     {
@@ -164,13 +184,16 @@ public class IntervalTreapTester
         {
             return true;
         }
-        checkMax(n);
-        boolean right = MaxRec(n.getRight());
-        boolean left = MaxRec(n.getLeft());
-        if(right && left)
+        if(checkMax(n))
         {
-            return true;
+            boolean right = MaxRec(n.getRight());
+            boolean left = MaxRec(n.getLeft());
+            if(right && left)
+            {
+                return true;
+            }
         }
+
         return false;
     }
 
