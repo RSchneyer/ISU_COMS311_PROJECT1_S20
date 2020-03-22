@@ -145,12 +145,20 @@ public class IntervalTreap
      */
     void intervalDelete(Node z)
     {
+        if(z == null)
+        {
+            return;
+        }
         size--;
         //if z is a leaf
         if(z.getRight() == null && z.getLeft() == null)
         {
-            //Fix iMaxUp
-            recFixMax(z.getParent());
+            if(z.equals(root))
+            {
+                root = null;
+                return;
+            }
+
             if(z.getParent().getLeft().equals(z))
             {
                 z.getParent().setLeft(null);
@@ -159,6 +167,10 @@ public class IntervalTreap
             {
                 z.getParent().setRight(null);
             }
+            //Fix iMaxUp
+            recFixMax(z.getParent());
+            //Fix
+            recFixHeight(z.getParent());
             return;
         }
         //Find the replacement node (could be null)
@@ -171,6 +183,7 @@ public class IntervalTreap
         {
             replacement = z.getLeft();
         }
+        ////////////////////////////StartWeird Case/////////////////////////////////
         else
         {
             replacement = min(z.getRight());
@@ -202,6 +215,8 @@ public class IntervalTreap
             //Finish moving replacement down
             rotateDown(replacement);
         }
+        ///////////////////////End Weird Case ////////////////////////////////////
+
         //Remove the replacement from its location and recursively fix the max
         if(replacement.getParent().getRight().equals(replacement))
         {
@@ -214,17 +229,28 @@ public class IntervalTreap
             recFixMax(replacement.getParent());
         }
         //Now place it in and recursively fix imax
-        if(z.getParent().getLeft().equals(z))
+        if(z.getParent() != null && z.getParent().getLeft() != null && //Gotta love null checks
+                z.getParent().getLeft().equals(z))
         {
             z.getParent().setLeft(replacement);
+            replacement.setParent(z.getParent());
+            recFixMax(z.getParent());
+        }
+        else if (z.getParent() != null)
+        {
+            z.getParent().setRight(replacement);
+            replacement.setParent(z.getParent());
             recFixMax(z.getParent());
         }
         else
         {
-            z.getParent().setRight(replacement);
-            recFixMax(z.getParent());
+            //Think this means z is root?
+            if(z.equals(root))
+            {
+                root = replacement;
+                root.setParent(null);
+            }
         }
-
     }
 
     /**
@@ -261,41 +287,23 @@ public class IntervalTreap
     private void fixMax(Node x)
     {
         //case 1 x is a leaf
-        if(x.getRight() == null && x.getLeft() == null)
+        if (x.getRight() == null && x.getLeft() == null)
         {
             x.setiMax(x.getInterv().getHigh());
         }
         //case 2 right == null
-        else if(x.getRight() == null)
+        else if (x.getRight() == null)
         {
             x.setiMax(Math.max(x.getInterv().getHigh(), x.getLeft().getIMax()));
         }
         //case 3 left == null
-        else if(x.getLeft() == null)
+        else if (x.getLeft() == null)
         {
             x.setiMax(Math.max(x.getInterv().getHigh(), x.getRight().getIMax()));
-        }
-        else
+        } else
         {
             int childMax = Math.max(x.getLeft().getIMax(), x.getRight().getIMax());
             x.setiMax(Math.max(childMax, x.getInterv().getHigh()));
-        }
-    }
-
-    /**
-     * Replaces with children nodes.
-     */
-    private void replace(Node newChild, Node oldChild, Node parent)
-    {
-        if(parent.getRight().equals(oldChild))
-        {
-            parent.setRight(newChild);
-            newChild.setParent(parent);
-        }
-        else
-        {
-            parent.setLeft(newChild);
-            newChild.setParent(parent);
         }
     }
 
@@ -316,7 +324,7 @@ public class IntervalTreap
      */
     private void recFixMax(Node n)
     {
-        if(n.equals(root))
+        if(n == null || n.equals(root))
         {
             return;
         }

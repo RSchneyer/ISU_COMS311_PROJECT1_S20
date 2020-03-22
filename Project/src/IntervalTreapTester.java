@@ -43,7 +43,7 @@ public class IntervalTreapTester
        // assertTrue(treap.getHeight() < (Math.log(bigNumber) * Math.log(bigNumber))); //Give a bit of wiggle room
     }
     @Test
-    public void basicInsert()
+    public void smallTests()
     {
         int [][] testIntervalVals = {{0,3},{5,8},{6,10},{8,9},{15,23},{16,21},{17,19},{19,20},{25,30},{26,26}};
         int [] testPriorities = {21,17,20,12,16,8,13,17,10,11};
@@ -61,15 +61,28 @@ public class IntervalTreapTester
             testTreap.intervalInsert(testNode);
         }
 
-        System.out.printf("\nTreap of size " + testTreap.getSize() +" complete, now inorder printing\n");
-        IntervalTreap.inorder(testTreap.getRoot());
+    //    System.out.printf("\nTreap of size " + testTreap.getSize() +" complete, now inorder printing\n");
+    //    IntervalTreap.inorder(testTreap.getRoot());
         //Might make more sense to make inorder also keep track of height and size to double check
+        for(int i =0; i < testIntervalVals.length; i++) // Fails on i = 2
+        {
+            Node del = testTreap.intervalSearchExactly(new Interval(testIntervalVals[i][0], testIntervalVals[i][1]));
+            testTreap.intervalDelete(del);
+            if(testTreap.getSize() != testIntervalVals.length - i - 1)
+            {
+                System.out.println(i);
+            }
+        }
+        assertEquals(0, testTreap.getSize());
+        assertNull(testTreap.getRoot());
+
+      //  System.out.println(testTreap.getSize());
     }
 
     @Test
     public void basicSearch()
     {
-        for(int x =0; x <bigNumber; x++)
+        for(int x =0; x <treap.getSize(); x++)
         {
                 assertNotNull(treap.intervalSearch(intervalList.get(x)));
         }
@@ -102,7 +115,7 @@ public class IntervalTreapTester
     {
         int expectedHeight = treap.getHeight();
         int actual = GetHeight(treap.getRoot(),-1);
-        System.out.println("expected " + expectedHeight + " actual" + actual);
+        //System.out.println("expected " + expectedHeight + " actual" + actual);
         assertTrue(GetHeight(treap.getRoot(), -1) == treap.getHeight());
 
     }
@@ -119,6 +132,42 @@ public class IntervalTreapTester
         assertTrue(recCheckPrio(treap.getRoot()));
     }
 
+    /**
+     * Basic delete technically has a chance to fail if two intervals are exactly the same but not likely
+     */
+   // @Test
+    public void DeleteTest()
+    {
+            Node toDel = treap.intervalSearchExactly(intervalList.get(0));
+            treap.intervalDelete(toDel);
+            assertTrue(treap.getSize() == bigNumber - 1);
+            assertNull(treap.intervalSearchExactly(intervalList.get(0)));
+    }
+
+    //@Test
+    public void DeleteAll()
+    {
+        for(int i =0; i < bigNumber; i++)
+        {
+            Node toDel = treap.intervalSearchExactly(intervalList.get(0));
+            treap.intervalDelete(toDel);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //---------------------Helpers-------------------------------------
    public static boolean recCheckPrio(Node n)
     {
         if(n == null || n.getParent() == null)
