@@ -69,7 +69,7 @@ public class IntervalTreap
         int nodeHeight = 0;
         while(true) //might be better as a check/boolean flag
         {
-            //Going down so our height increases (might cause off by one but too lazy to double check)
+            //Going down so our height increases
             nodeHeight++;
             //Update y (parent) imax
             if(y.getIMax() < z.getIMax())
@@ -159,7 +159,7 @@ public class IntervalTreap
                 return;
             }
 
-            if(z.getParent().getLeft().equals(z))
+            if(z.getParent().getLeft() != null && z.getParent().getLeft().equals(z))
             {
                 z.getParent().setLeft(null);
             }
@@ -167,90 +167,75 @@ public class IntervalTreap
             {
                 z.getParent().setRight(null);
             }
+            //log n + log n
             //Fix iMaxUp
             recFixMax(z.getParent());
             //Fix
             recFixHeight(z.getParent());
             return;
+
         }
-        //Find the replacement node (could be null)
         Node replacement = null;
         if(z.getLeft() == null)
         {
-            replacement = z.getRight();
+            if(z.getParent() != null && z.getParent().getRight() != null && z.getParent().getRight().equals(z))
+            {
+                z.getParent().setRight(z.getRight());
+            }
+            else if(z.getParent() != null)
+            {
+                z.getParent().setLeft(z.getRight());
+            }
+            else
+            {
+                root = z.getRight();
+            }
+            z.getRight().setParent(z.getParent());
+            //log n + log n
+            recFixMax(z.getRight());
+            recFixHeight(z.getRight());
+
         }
         else if(z.getRight() == null)
         {
-            replacement = z.getLeft();
+            if(z.getParent() != null && z.getParent().getRight() != null && z.getParent().getRight().equals(z))
+            {
+                z.getParent().setRight(z.getLeft());
+            }
+            else if(z.getParent() != null)
+            {
+                z.getParent().setLeft(z.getLeft());
+            }
+            else
+            {
+                root = z.getLeft();
+            }
+            z.getLeft().setParent(z.getParent());
+            // logn + logn
+            recFixMax(z.getLeft());
+            recFixHeight(z.getLeft());
         }
         ////////////////////////////StartWeird Case/////////////////////////////////
         else
         {
+            /**
+             * Note while this does call itself again, it is still log n since we know the next time we call the method
+             * it will take log n time since left will be null
+             */
             replacement = min(z.getRight());
             // This case is different since minheap can be violated
-            if(replacement.getParent().getRight() != null &&
-                    replacement.getParent().getRight().equals(replacement))
-            {
-                replacement.getParent().setRight(z);
-            }
-            else
-            {
-                replacement.getParent().setLeft(z);
-
-            }
+            //NOTE TRANSPLANT IS LOG N and fixes imax and height
+            transplant(z, replacement);
             //swap nodes then try deleting in new spot
-            Node temp = replacement.getRight();
-            Node tempP = replacement.getParent();
-            replacement.setLeft(z.getLeft());
-            replacement.setRight(z.getRight());
-            replacement.setParent(z.getParent());
-            z.setLeft(null);
-            z.setRight(temp);
-            z.setParent(tempP);
-            //didnt end up deleting will do it next time since x left is null
             size++;
+            // + logn
             intervalDelete(z);
-            //Fix replacement then move on
-            recFixMax(replacement);
             //Finish moving replacement down
+            // + log n
             rotateDown(replacement);
+           // return;
         }
         ///////////////////////End Weird Case ////////////////////////////////////
-
-        //Remove the replacement from its location and recursively fix the max
-        if(replacement.getParent().getRight().equals(replacement))
-        {
-            replacement.getParent().setRight(null);
-            recFixMax(replacement.getParent());
-        }
-        else
-        {
-            replacement.getParent().setLeft(null);
-            recFixMax(replacement.getParent());
-        }
-        //Now place it in and recursively fix imax
-        if(z.getParent() != null && z.getParent().getLeft() != null && //Gotta love null checks
-                z.getParent().getLeft().equals(z))
-        {
-            z.getParent().setLeft(replacement);
-            replacement.setParent(z.getParent());
-            recFixMax(z.getParent());
-        }
-        else if (z.getParent() != null)
-        {
-            z.getParent().setRight(replacement);
-            replacement.setParent(z.getParent());
-            recFixMax(z.getParent());
-        }
-        else
-        {
-            //Think this means z is root?
-            if(z.equals(root))
-            {
-                root = replacement;
-                root.setParent(null);
-            }
-        }
     }
 
     /**
@@ -281,6 +266,158 @@ public class IntervalTreap
         return x;
     }
 
+    /**
+     * DO NOT TOUCH IT WORKS NOW; SEE TRANSPLANT2 FOR WHAT FAILURE LOOKS LIKE
+     */
+    private void transplant(Node n, Node z)
+    {
+        //Log n since it has the recursive fix calls.
+        //Grab nodes
+        Node nParent = n.getParent();
+        Node nLeft = n.getLeft();
+        Node nRight = n.getRight();
+        Node zParent = z.getParent();
+        //  zleft is always null
+        Node zRight = z.getRight();
+        //case 1 z is right child of n
+        if(n.getRight().equals(z))
+        {
+            z.setParent(nParent);
+            z.setRight(n);
+            z.setLeft(nLeft);
+
+            n.setLeft(null);
+            n.setRight(zRight);
+            n.setParent(z);
+            if(nParent != null && nParent.getRight() != null && nParent.getRight().equals(n))
+            {
+                nParent.setRight(z);
+            }
+            else if(nParent != null)
+            {
+                nParent.setLeft(z);
+            }
+            else
+            {
+                root = z;
+            }
+            //Shouldn't have to check n's new parent since its z
+            if(nLeft != null)
+            {
+                nLeft.setParent(z);
+            }
+            if(zRight != null)
+            {
+                zRight.setParent(n);
+            }
+        }
+        else
+        {
+            z.setParent(nParent);
+            z.setLeft(nLeft);
+            z.setRight(nRight);
+
+            n.setLeft(null);
+            n.setRight(zRight);
+            n.setParent(zParent);
+
+            if(nParent != null && nParent.getRight() != null && nParent.getRight().equals(n))
+            {
+                nParent.setRight(z);
+            }
+            else if (nParent != null)
+            {
+                nParent.setLeft(z);
+            }
+            else
+            {
+                root = z;
+            }
+            if(nLeft != null)
+            {
+                nLeft.setParent(z);
+            }
+            if(nRight != null)
+            {
+                nRight.setParent(z);
+            }
+            if(zRight != null)
+            {
+                zRight.setParent(n);
+            }
+            zParent.setLeft(n);
+        }
+        recFixHeight(n);
+        recFixMax(n);
+        recFixHeight(z);
+        recFixMax(z);
+    }
+    private void transplant2(Node n, Node z)
+    {
+        //Grab nodes
+        Node nParent = n.getParent();
+        Node nLeft = n.getLeft();
+        Node nRight = n.getRight();
+        Node zParent = z.getParent();
+        Node zLeft = z.getLeft();
+        Node zRight = z.getRight();
+        //set references for n
+        if(zParent.equals(n))
+        {
+            n.setParent(z);
+        }
+        else
+        {
+            n.setParent(zParent);
+        }
+        n.setLeft(zLeft);
+        n.setRight(zRight);
+        //set references for z
+        z.setParent(nParent);
+        if(nRight.equals(z))
+        {
+            z.setRight(n);
+        }
+        else
+        {
+            z.setRight(nRight);
+        }
+        z.setLeft(nLeft);
+
+        if(nRight != null && nRight != z)
+        {
+            nRight.setParent(z);
+        }
+        if(nLeft != null && nLeft != z)
+        {
+            nLeft.setParent(z);
+        }
+        if(zRight != null && zRight != n)
+        {
+            zRight.setParent(n);
+        }
+        if(zLeft != null && zLeft != n)
+        {
+            zLeft.setParent(n);
+        }
+        if(nParent != null && nParent.getRight() != null && nParent.getRight().equals(n))
+        {
+            nParent.setRight(z);
+        }
+        else if (nParent != null && nParent != z)
+        {
+            nParent.setLeft(z);
+        }
+        // Then do the z parent
+        if(zParent != null && zParent.getRight() != null && zParent.getRight().equals(z))
+        {
+            zParent.setRight(n);
+        }
+        else if (nParent != null && zParent != n)
+        {
+            zParent.setLeft(n);
+        }
+    }
     /**
      * Fixes the max of the node
      */
@@ -324,7 +461,7 @@ public class IntervalTreap
      */
     private void recFixMax(Node n)
     {
-        if(n == null || n.equals(root))
+        if(n == null)
         {
             return;
         }
@@ -375,7 +512,6 @@ public class IntervalTreap
         //we know this node has less priority since it's a successor
         while(rotateDownCheck(n))
         {
-
             //Determine which way we can rotate (rotations preserve inorder so only thing that matters is priority)
             if(n.getRight() != null && n.getPriority() >= n.getRight().getPriority()) //If n has a right child with less priority we need to rotate down
             {
@@ -385,7 +521,13 @@ public class IntervalTreap
             {
                 rotateRight(n);
             }
+            else
+            {
+                System.out.println("WTFFFF");
+            }
         }
+        recFixMax(n);
+        recFixHeight(n);
     }
 
     private boolean rotateDownCheck(Node n)

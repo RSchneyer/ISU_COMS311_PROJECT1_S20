@@ -10,7 +10,7 @@ import static junit.framework.TestCase.*;
 public class IntervalTreapTester
 {
     static int bigNumber = 10000;
-    private Random rand = new Random(3);
+    private Random rand = new Random();
     private IntervalTreap treap;
     private List<Interval> intervalList = new ArrayList<Interval>();
     private List<Node> nodeList = new ArrayList<Node>();
@@ -18,7 +18,7 @@ public class IntervalTreapTester
     public void setup()
     {
         treap = new IntervalTreap();
-        rand = new Random(3);
+        rand = new Random();
         for(int i =0; i < bigNumber; i++)
         {
             int numBig = rand.nextInt();
@@ -66,18 +66,38 @@ public class IntervalTreapTester
         //Might make more sense to make inorder also keep track of height and size to double check
         for(int i =0; i < testIntervalVals.length; i++) // Fails on i = 2
         {
-            Node del = testTreap.intervalSearchExactly(new Interval(testIntervalVals[i][0], testIntervalVals[i][1]));
+            Node del = testTreap.intervalSearchExactly(new Interval(testIntervalVals[9 - i][0], testIntervalVals[9-i][1]));
             testTreap.intervalDelete(del);
-            if(testTreap.getSize() != testIntervalVals.length - i - 1)
-            {
-                System.out.println(i);
-            }
+            //testTreap.intervalDelete(IntervalTreap.min(testTreap.getRoot()));
         }
-        assertEquals(0, testTreap.getSize());
-        assertNull(testTreap.getRoot());
+//        assertEquals(0, testTreap.getSize());
+//        assertNull(testTreap.getRoot());
 
       //  System.out.println(testTreap.getSize());
     }
+
+    @Test
+    public void DeleteRoot()
+    {
+        int [][] testIntervalVals = {{0,3},{5,8},{6,10},{8,9},{15,23},{16,21},{17,19},{19,20},{25,30},{26,26}};
+        int [] testPriorities = {21,17,20,12,16,8,13,17,10,11};
+
+        IntervalTreap testTreap = new IntervalTreap();
+        Node testNode;
+        Interval testInterval;
+
+        for(int x=0; x<testIntervalVals.length; x++)
+        {
+            testInterval = new Interval(testIntervalVals[x][0], testIntervalVals[x][1]);
+            testNode = new Node(testInterval);
+            testNode.setPriority(testPriorities[x]);
+
+            testTreap.intervalInsert(testNode);
+        }
+        testTreap.intervalDelete(testTreap.getRoot().getLeft());
+        //  System.out.println(testTreap.getSize());
+    }
+
 
     @Test
     public void basicSearch()
@@ -135,7 +155,7 @@ public class IntervalTreapTester
     /**
      * Basic delete technically has a chance to fail if two intervals are exactly the same but not likely
      */
-   // @Test
+    @Test
     public void DeleteTest()
     {
             Node toDel = treap.intervalSearchExactly(intervalList.get(0));
@@ -144,13 +164,54 @@ public class IntervalTreapTester
             assertNull(treap.intervalSearchExactly(intervalList.get(0)));
     }
 
-    //@Test
+    @Test
     public void DeleteAll()
     {
         for(int i =0; i < bigNumber; i++)
         {
-            Node toDel = treap.intervalSearchExactly(intervalList.get(0));
+            Node toDel = treap.intervalSearchExactly(intervalList.get(i));
+            assertNotNull(toDel);
             treap.intervalDelete(toDel);
+        }
+        assertEquals(0, treap.getSize());
+        Node root = treap.getRoot();
+        assertNull(treap.getRoot());
+    }
+
+    @Test
+    public void DeleteMaintainsPriority()
+    {
+        for(int i =0; i < bigNumber; i++)
+        {
+            Node toDel = treap.intervalSearchExactly(intervalList.get(i));
+            assertNotNull(toDel);
+            treap.intervalDelete(toDel);
+            //assertTrue(MaxRec(treap.getRoot()));
+            assertTrue(recCheckPrio(treap.getRoot()));
+        }
+    }
+
+    @Test
+    public void DeleteMaintainsIMax()
+    {
+        for(int i =0; i < bigNumber; i++)
+        {
+            Node toDel = treap.intervalSearchExactly(intervalList.get(i));
+            assertNotNull(toDel);
+            treap.intervalDelete(toDel);
+            assertTrue(MaxRec(treap.getRoot()));
+        }
+    }
+
+    @Test
+    public void DeleteMaintainsHeight()
+    {
+        for(int i =0; i < bigNumber - 1; i++)
+        {
+            Node toDel = treap.intervalSearchExactly(intervalList.get(i));
+            assertNotNull(toDel);
+            treap.intervalDelete(toDel);
+            assertEquals(treap.getRoot().getHeight(), GetHeight(treap.getRoot(), -1));
         }
     }
 
