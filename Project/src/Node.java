@@ -7,6 +7,7 @@ public class Node
     private Node right;
     private Interval nodeInterval;
     private int iMax;
+    private int iMin;
     private int priority;
     private int height;
 
@@ -96,5 +97,15 @@ public class Node
     public void decHeight()
     {
         height--;
+    }
+
+    public int getiMin()
+    {
+        return iMin;
+    }
+
+    public void setiMin(int iMin)
+    {
+        this.iMin = iMin;
     }
 }

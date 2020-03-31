@@ -66,6 +66,7 @@ public class IntervalTreap
         }
         //First set z.imax to z.high
         z.setiMax(z.getInterv().getHigh());
+        z.setiMin(z.getInterv().getLow());
         //Go down using zlow as key
         Node y = root;
         //Log(n) while
@@ -78,6 +79,10 @@ public class IntervalTreap
             if(y.getIMax() < z.getIMax())
             {
                 y.setiMax(z.getIMax());
+            }
+            if(y.getiMin() > z.getiMin())
+            {
+                y.setiMin(z.getiMin());
             }
 
             //try left
@@ -430,19 +435,24 @@ public class IntervalTreap
         if (x.getRight() == null && x.getLeft() == null)
         {
             x.setiMax(x.getInterv().getHigh());
+            x.setiMin(x.getInterv().getLow());
         }
         //case 2 right == null
         else if (x.getRight() == null)
         {
             x.setiMax(Math.max(x.getInterv().getHigh(), x.getLeft().getIMax()));
+            x.setiMin(Math.min(x.getInterv().getLow(), x.getLeft().getiMin()));
         }
         //case 3 left == null
         else if (x.getLeft() == null)
         {
             x.setiMax(Math.max(x.getInterv().getHigh(), x.getRight().getIMax()));
+            x.setiMin(Math.min(x.getInterv().getLow(), x.getRight().getiMin()));
         } else
         {
             int childMax = Math.max(x.getLeft().getIMax(), x.getRight().getIMax());
+            int childMin = Math.min(x.getLeft().getiMin(), x.getRight().getiMin());
+            x.setiMin(Math.min(childMin, x.getInterv().getLow()));
             x.setiMax(Math.max(childMax, x.getInterv().getHigh()));
         }
     }
@@ -702,18 +712,18 @@ public class IntervalTreap
         recOverlap(i, root, list);
         return list;
     }
-    
+
     private void recOverlap(Interval i, Node n, List<Interval> list)
     {
-        //If the node has a left child that overlaps
+        //If the node has a left child
         if(n.getLeft() != null)
         {
            //Now check if it's possible for a node below to have stored the interval
-            Interval max = new Interval(n.getRight().getInterv().getLow(), n.getRight().getIMax());
+            Interval max = new Interval(n.getLeft().getiMin(), n.getLeft().getIMax());
           //If it's possible for the interval to overlap on the child check
            if(max.overlap(i))
            {
-               recOverlap(i, n.getRight(), list);
+               recOverlap(i, n.getLeft(), list);
            }
         }
         //Check if this node belongs in the list
@@ -724,11 +734,11 @@ public class IntervalTreap
         //if the node has a right child that overlaps
         if(n.getRight() != null)
         {
-            Interval max = new Interval(n.getLeft().getInterv().getLow(), n.getLeft().getIMax());
+            Interval max = new Interval(n.getRight().getiMin(), n.getRight().getIMax());
             //If it's possible for the interval to overlap on the child check
             if(max.overlap(i))
             {
-                recOverlap(i, n.getLeft(), list);
+                recOverlap(i, n.getRight(), list);
             }
         }
     }

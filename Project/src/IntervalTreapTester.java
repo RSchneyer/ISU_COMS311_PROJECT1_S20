@@ -140,7 +140,7 @@ public class IntervalTreapTester
 
     }
 
-    @Test
+   @Test
     public void InsertMaintainsImax()
     {
         assertTrue(MaxRec(treap.getRoot()));
@@ -215,20 +215,44 @@ public class IntervalTreapTester
         }
     }
 
-
-
-
-
-
-
-
-
+    @Test
+    public void overlappingIntervals()
+    {
+        for(int i = 0; i < 15; i++)
+        {
+            List<Interval> realList = getRealList(treap, intervalList.get(i));
+            List<Interval> outputList = treap.overlappingIntervals(intervalList.get(i));
+            //Sanity check
+            assertTrue(outputList != null);
+            assertTrue(realList != null);
+            assertEquals(realList.size(), outputList.size());
+            //Every Interval that exists in the real list exists in the output
+            for(int j = 0; j < realList.size(); j++)
+            {
+                assertTrue(outputList.contains(realList.get(j)));
+            }
+        }
+    }
 
 
 
 
 
     //---------------------Helpers-------------------------------------
+    public static List<Interval> getRealList(IntervalTreap t, Interval i)
+    {
+        List<Interval> list = new ArrayList<Interval>();
+        Node n = IntervalTreap.min(t.getRoot());
+        while(n != null)
+        {
+            if(n.getInterv().overlap(i))
+            {
+                list.add(n.getInterv());
+            }
+            n = IntervalTreap.successor(n);
+        }
+        return list;
+    }
    public static boolean recCheckPrio(Node n)
     {
         if(n == null || n.getParent() == null)
@@ -246,29 +270,6 @@ public class IntervalTreapTester
         }
         return false;
     }
-  /* -----------------------------TESTCODE------------------------------
-   public static int GetHeightNode(Node n, int prev)
-    {
-        //starts at 0
-        if(n == null)
-        {
-            return prev;
-        }
-        if(n.getRight() == null && n.getLeft() == null)
-        {
-            return 0;
-        }
-        int right = GetHeightNode(n.getRight(), prev);
-        int left = GetHeightNode(n.getLeft(), prev);
-        if(right > left)
-        {
-            return right + 1;
-        }
-        else
-        {
-            return left + 1;
-        }
-    } */
 
     public static int GetHeight(Node n, int prev)
     {
