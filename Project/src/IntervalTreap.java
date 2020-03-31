@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Justin Merkel, Reid Schneyer
  */
@@ -660,6 +663,7 @@ public class IntervalTreap
         n.setHeight(Math.max(left,right) + 1);
     }
     /**
+     * Extra credit 1
      * Returns a reference to a node in the treap such that low = low and high = high
      */
     public Node intervalSearchExactly(Interval i)
@@ -684,6 +688,50 @@ public class IntervalTreap
         return x;
     }
 
+    /**
+     * Extra credit 2
+     */
+    public List<Interval> overlappingIntervals(Interval i)
+    {
+        if(root == null)
+        {
+            return null;
+        }
+        //start working on the problem recursively
+        List<Interval> list = new ArrayList<Interval>();
+        recOverlap(i, root, list);
+        return list;
+    }
+    
+    private void recOverlap(Interval i, Node n, List<Interval> list)
+    {
+        //If the node has a left child that overlaps
+        if(n.getLeft() != null)
+        {
+           //Now check if it's possible for a node below to have stored the interval
+            Interval max = new Interval(n.getRight().getInterv().getLow(), n.getRight().getIMax());
+          //If it's possible for the interval to overlap on the child check
+           if(max.overlap(i))
+           {
+               recOverlap(i, n.getRight(), list);
+           }
+        }
+        //Check if this node belongs in the list
+        if(n.getInterv().overlap(i))
+        {
+            list.add(n.getInterv());
+        }
+        //if the node has a right child that overlaps
+        if(n.getRight() != null)
+        {
+            Interval max = new Interval(n.getLeft().getInterv().getLow(), n.getLeft().getIMax());
+            //If it's possible for the interval to overlap on the child check
+            if(max.overlap(i))
+            {
+                recOverlap(i, n.getLeft(), list);
+            }
+        }
+    }
     private void recFixHeight(Node n)
     {
         if(n == null)
