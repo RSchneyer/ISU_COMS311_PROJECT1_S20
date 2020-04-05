@@ -1,5 +1,8 @@
 import java.util.Random;
 
+/**
+ * @author Justin Merkel, Reid Schneyer
+ * */
 public class Node
 {
     private Node parent;
