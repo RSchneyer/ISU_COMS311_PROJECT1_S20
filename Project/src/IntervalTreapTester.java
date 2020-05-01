@@ -4,12 +4,14 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
+/**
+ * @author Justin Merkel, Reid Schneyer
+ */
 import static junit.framework.TestCase.*;
 
 public class IntervalTreapTester
 {
-    static int bigNumber = 10000;
+    static int bigNumber = 1000;
     private Random rand = new Random();
     private IntervalTreap treap;
     private List<Interval> intervalList = new ArrayList<Interval>();
@@ -33,6 +35,7 @@ public class IntervalTreapTester
             nodeList.add(new Node(intervalList.get(i)));
             treap.intervalInsert(nodeList.get(i));
         }
+
 
     }
     @Test
@@ -218,7 +221,7 @@ public class IntervalTreapTester
     @Test
     public void overlappingIntervals()
     {
-        for(int i = 0; i < 15; i++)
+        for(int i = 0; i < 1000; i++)
         {
             List<Interval> realList = getRealList(treap, intervalList.get(i));
             List<Interval> outputList = treap.overlappingIntervals(intervalList.get(i));
@@ -255,11 +258,20 @@ public class IntervalTreapTester
     }
    public static boolean recCheckPrio(Node n)
     {
-        if(n == null || n.getParent() == null)
+        if(n == null)
         {
             return true;
         }
-        if(n.getPriority() > n.getParent().getPriority())
+        if(n.getParent() == null)
+        {
+            boolean right = recCheckPrio(n.getRight());
+            boolean left = recCheckPrio(n.getLeft());
+            if(left && right)
+            {
+                return true;
+            }
+        }
+        else if(n.getPriority() > n.getParent().getPriority())
         {
             boolean right = recCheckPrio(n.getRight());
             boolean left = recCheckPrio(n.getLeft());

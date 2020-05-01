@@ -115,10 +115,11 @@ public class IntervalTreap
                 }
             }
         }
-        if(nodeHeight > height)
-        {
-            height = nodeHeight;
-        }
+//        if(nodeHeight > height)
+//        {
+//            height = nodeHeight;
+//        }
+        //Another log n call
         recFixHeight(y);
         //Now that we found our insertion point, second phase begins
         //Log(n) while since rotations and fixHeight are O(1)
@@ -228,7 +229,7 @@ public class IntervalTreap
         {
             /**
              * Note while this does call itself again, it is still log n since we know the next time we call the method
-             * it will take log n time since left will be null
+             * it will take O(logn) time since left will be null meaning logn + logn
              */
             replacement = min(z.getRight());
             // This case is different since minheap can be violated
@@ -262,7 +263,7 @@ public class IntervalTreap
         while(x != null && !x.getInterv().overlap(i))
         {
             //Currently the low is higher than our low so move left
-            if(x.getInterv().getLow() > i.getLow())
+            if(x.getLeft() != null && x.getLeft().getIMax() >= i.getLow())
             {
                 x = x.getLeft();
             }
@@ -275,7 +276,7 @@ public class IntervalTreap
     }
 
     /**
-     * DO NOT TOUCH IT WORKS NOW; SEE TRANSPLANT2 FOR WHAT FAILURE LOOKS LIKE
+     * DO NOT TOUCH IT WORKS NOW; SEE TRANSPLANT2 FOR WHAT FAILURE LOOKS LIKE (Log N time)
      */
     private void transplant(Node n, Node z)
     {
@@ -427,7 +428,7 @@ public class IntervalTreap
         }
     }
     /**
-     * Fixes the max of the node
+     * Fixes the max of the node (also the min for the extra credit)
      */
     private void fixMax(Node x)
     {
@@ -470,7 +471,7 @@ public class IntervalTreap
     }
 
     /**
-     * Recursive call to fix imax up
+     * Recursive call to fix imax up (and min for EC)
      */
     private void recFixMax(Node n)
     {
@@ -526,7 +527,18 @@ public class IntervalTreap
         while(rotateDownCheck(n))
         {
             //Determine which way we can rotate (rotations preserve inorder so only thing that matters is priority)
-            if(n.getRight() != null && n.getPriority() >= n.getRight().getPriority()) //If n has a right child with less priority we need to rotate down
+            if(n.getRight() != null && n.getLeft() != null) //This is the change for delete to maintain priority I forgot that it's possible one of the subtrees breaks priority when you use both
+            {
+                if(n.getRight().getPriority() > n.getLeft().getPriority())
+                {
+                    rotateRight(n);
+                }
+                else
+                {
+                    rotateLeft(n);
+                }
+            }
+            else if(n.getRight() != null && n.getPriority() >= n.getRight().getPriority()) //If n has a right child with less priority we need to rotate down
             {
                 rotateLeft(n);
             }
@@ -539,6 +551,7 @@ public class IntervalTreap
                 System.out.println("WTFFFF");
             }
         }
+        //Logn to fix max and height after log n while
         recFixMax(n);
         recFixHeight(n);
     }
@@ -553,7 +566,7 @@ public class IntervalTreap
         {
             return false;
         }
-        else if(n.getRight() == null && (n.getLeft() != null && n.getLeft().getPriority()> n.getPriority())) //right is null and right has greater priority
+        else if(n.getRight() == null && (n.getLeft() != null && n.getLeft().getPriority()> n.getPriority())) //right is null and left has greater priority
         {
             return false;
         }

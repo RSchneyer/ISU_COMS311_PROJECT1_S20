@@ -1,12 +1,15 @@
+/**
+ * @author Justin Merkel, Reid Schneyer
+ */
 public class Interval
 {
     private int low;
     private int high;
 
-    public Interval(int min, int max)
+    public Interval(int low, int high)
     {
-        low = min;
-        high = max;
+        this.low = low;
+        this.high = high;
     }
 
     public int getLow()
