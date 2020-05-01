@@ -1,6 +1,7 @@
 /**
  * @author Justin Merkel, Reid Schneyer
  */
+
 public class Interval
 {
     private int low;

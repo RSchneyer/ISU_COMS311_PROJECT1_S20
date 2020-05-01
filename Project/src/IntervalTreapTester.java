@@ -1,3 +1,4 @@
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -8,6 +9,10 @@ import java.util.Random;
  * @author Justin Merkel, Reid Schneyer
  */
 import static junit.framework.TestCase.*;
+
+/**
+ * @author Justin Merkel, Reid Schneyer
+ * */
 
 public class IntervalTreapTester
 {
