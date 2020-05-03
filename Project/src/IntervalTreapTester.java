@@ -117,6 +117,15 @@ public class IntervalTreapTester
     }
 
     @Test
+    public void basicSearchExactly()
+    {
+        for(int x =0; x <treap.getSize(); x++)
+        {
+            assertNotNull(treap.intervalSearchExactly(intervalList.get(x)));
+        }
+    }
+
+    @Test
     public void InorderKey()
     {
         Node min = IntervalTreap.min(treap.getRoot());
@@ -134,7 +143,7 @@ public class IntervalTreapTester
     {
         for(int i =0; i < bigNumber; i++)
         {
-            treap.intervalSearchExactly(intervalList.get(i));
+            assertNotNull(treap.intervalSearchExactly(intervalList.get(i)));
         }
     }
 

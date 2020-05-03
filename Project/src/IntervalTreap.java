@@ -699,7 +699,7 @@ public class IntervalTreap
         while(x != null && !(x.getInterv().getLow() == i.getLow() && x.getInterv().getHigh() == i.getHigh()))
         {
             //Currently the low is higher than our low so move left
-            if(x.getInterv().getLow() > i.getLow())
+            if(x.getLeft() != null && x.getInterv().getLow() > i.getLow())
             {
                 x = x.getLeft();
             }
